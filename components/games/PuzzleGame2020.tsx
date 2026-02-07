@@ -8,29 +8,44 @@ type Tile = {
   currentPos: number;
 };
 
-const isSolvable = (tiles: number[]): boolean => {
-  let inversions = 0;
-  const filtered = tiles.filter((t) => t !== 8);
+const getNeighbors = (pos: number): number[] => {
+  const row = Math.floor(pos / 3);
+  const col = pos % 3;
+  const neighbors: number[] = [];
   
-  for (let i = 0; i < filtered.length; i++) {
-    for (let j = i + 1; j < filtered.length; j++) {
-      if (filtered[i] > filtered[j]) inversions++;
-    }
-  }
-  return inversions % 2 === 0;
+  if (row > 0) neighbors.push(pos - 3); // 위
+  if (row < 2) neighbors.push(pos + 3); // 아래
+  if (col > 0) neighbors.push(pos - 1); // 왼쪽
+  if (col < 2) neighbors.push(pos + 1); // 오른쪽
+  
+  return neighbors;
 };
 
+// 쉬운 셔플: 완성 상태에서 25번만 섞기
 const createShuffledTiles = (): Tile[] => {
-  let positions: number[];
-  
-  do {
-    positions = [0, 1, 2, 3, 4, 5, 6, 7, 8].sort(() => Math.random() - 0.5);
-  } while (!isSolvable(positions) || isComplete(positions));
-  
-  return positions.map((pos, idx) => ({
-    id: pos,
-    currentPos: idx,
+  const tiles: Tile[] = [0, 1, 2, 3, 4, 5, 6, 7, 8].map((id) => ({
+    id,
+    currentPos: id,
   }));
+  
+  let emptyPos = 8;
+  const moves = 25;
+  let lastPos = -1; // 되돌아가는 거 방지
+  
+  for (let i = 0; i < moves; i++) {
+    const neighbors = getNeighbors(emptyPos).filter(n => n !== lastPos);
+    const randomNeighbor = neighbors[Math.floor(Math.random() * neighbors.length)];
+    
+    const tile = tiles.find(t => t.currentPos === randomNeighbor)!;
+    const emptyTile = tiles.find(t => t.id === 8)!;
+    
+    tile.currentPos = emptyPos;
+    lastPos = emptyPos;
+    emptyTile.currentPos = randomNeighbor;
+    emptyPos = randomNeighbor;
+  }
+  
+  return tiles;
 };
 
 const isComplete = (positions: number[]): boolean => {
@@ -52,10 +67,8 @@ export default function PuzzleGame2020() {
 
   const { completeGame, failGame } = useGameStore();
 
-  // 게임 오버는 계산된 값
   const isGameOver = timeLeft === 0 && !gameComplete;
 
-  // 타이머
   useEffect(() => {
     if (gameComplete || timeLeft === 0) return;
 
@@ -63,7 +76,6 @@ export default function PuzzleGame2020() {
       setTimeLeft((prev) => {
         if (prev <= 1) {
           clearInterval(timerRef.current!);
-          // 비동기로 failGame 호출
           if (!hasFailedRef.current) {
             hasFailedRef.current = true;
             setTimeout(() => failGame(2020), 0);
@@ -142,7 +154,6 @@ export default function PuzzleGame2020() {
     <div className="w-full flex flex-col items-center">
       {!gameComplete && !isGameOver ? (
         <>
-          {/* 퍼즐 그리드 - 4:3 비율 */}
           <div className="grid grid-cols-3 gap-1 mb-4 bg-black/30 p-1 rounded-lg">
             {[0, 1, 2, 3, 4, 5, 6, 7, 8].map((pos) => {
               const tile = tiles.find((t) => t.currentPos === pos);
@@ -176,7 +187,6 @@ export default function PuzzleGame2020() {
             })}
           </div>
 
-          {/* 하단 컨트롤 */}
           <div className="w-full flex justify-between items-center">
             <span className={`text-lg font-mono ${timeLeft <= 30 ? "text-red-400" : "text-white"}`}>
               ⏱ {formatTime(timeLeft)}
@@ -201,7 +211,7 @@ export default function PuzzleGame2020() {
         </>
       ) : isGameOver ? (
         <div className="text-center py-8">
-          <p className="text-white/70 mb-4">시간 초과</p>
+          <p className="text-white/70 mb-4">시간 초과!</p>
           <button
             onClick={initializeGame}
             className="px-6 py-3 bg-white/20 hover:bg-white/30 text-white rounded-lg transition font-semibold"
