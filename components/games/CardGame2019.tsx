@@ -100,7 +100,7 @@ export default function CardGame2019() {
                 key={card.id}
                 onClick={() => handleCardClick(card.id)}
                 className={`
-                  aspect-2/3 rounded-lg overflow-hidden transition-all duration-300
+                  aspect-2/3 overflow-hidden transition-all duration-300
                   ${
                     card.isFlipped || card.isMatched
                       ? "bg-zinc-500 shadow-lg"

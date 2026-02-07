@@ -2,8 +2,8 @@
 
 import { useState } from 'react';
 import Image from 'next/image';
-import GameModal from '../components/GameModal';
-import CardGame2019 from '../components/games/CardGame2019';
+import GameModal from '../components/GameModal'; // 경로는 실제 환경에 맞게 확인해주세요
+import CardGame2019 from '../components/games/CardGame2019'; // 경로는 실제 환경에 맞게 확인해주세요
 
 const miniatures = [
   { year: 2019, top: '17%', left: '10%' },
@@ -20,7 +20,7 @@ export default function Home() {
   const [selectedYear, setSelectedYear] = useState<number | null>(null);
 
   const handleMiniatureClick = (e: React.MouseEvent, year: number) => {
-    e.stopPropagation();
+    e.stopPropagation(); // 배경 클릭 등 이벤트 전파 방지
     setSelectedYear(year);
   };
 
@@ -45,34 +45,41 @@ export default function Home() {
 
       {/* 미니어처 배치 */}
       <div className="relative w-full h-full">
-        {miniatures.map((item) => (
-          <button
-            key={item.year}
-            onClick={(e) => handleMiniatureClick(e, item.year)}
-            className={`absolute group cursor-pointer w-12 h-12 transition-all duration-300 ${
-              selectedYear === item.year ? 'z-65 scale-125' : ''
-            }`}
-            style={{ top: item.top, left: item.left }}
-          >
-            {/* 미니어처 이미지 */}
-            <div className="relative w-full h-full transition-transform duration-300 hover:scale-125 hover:drop-shadow-2xl">
-              <Image
-                src={`/images/miniatures/${item.year}.png`}
-                alt={`${item.year}`}
-                fill
-                sizes="48px"
-                className="object-contain"
-              />
-            </div>
+        {miniatures.map((item) => {
+          const isSelected = selectedYear === item.year;
+          
+          return (
+            <button
+              key={item.year}
+              onClick={(e) => handleMiniatureClick(e, item.year)}
+              // 선택되었을 때(z-index 상승, 크기 확대) 스타일 적용
+              className={`absolute group cursor-pointer w-12 h-12 transition-all duration-300 ${
+                isSelected ? 'z-60 scale-125' : 'z-10'
+              }`}
+              style={{ top: item.top, left: item.left }}
+            >
+              {/* 미니어처 이미지 */}
+              <div className="relative w-full h-full transition-transform duration-300 hover:scale-125 hover:drop-shadow-2xl">
+                <Image
+                  src={`/images/miniatures/${item.year}.png`}
+                  alt={`${item.year}`}
+                  fill
+                  sizes="48px"
+                  className={`object-contain transition-opacity duration-300 hover:opacity-100 ${
+                    isSelected ? 'opacity-100' : 'opacity-25'
+                  }`}
+                />
+              </div>
 
-            {/* 년도 라벨 (hover시 표시) */}
-            <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
-              <span className="bg-black/70 text-white px-3 py-1 rounded text-sm font-bold whitespace-nowrap">
-                {item.year}
-              </span>
-            </div>
-          </button>
-        ))}
+              {/* 년도 라벨 (hover시 혹은 선택되었을 때 표시하고 싶다면 조건 추가 가능) */}
+              <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
+                <span className="bg-black/70 text-white px-3 py-1 rounded text-sm font-bold whitespace-nowrap">
+                  {item.year}
+                </span>
+              </div>
+            </button>
+          );
+        })}
       </div>
 
       {/* 게임 모달 */}
