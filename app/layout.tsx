@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'cometui_🌻',
+  title: 'cometui',
   description: '졸업을 축하하며',
   keywords: ['타임라인', '졸업', '2019-2026', '혜승'],
   authors: [{ name: 'cometui' }],

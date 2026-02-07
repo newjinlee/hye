@@ -1,5 +1,9 @@
+'use client';
+
+import { useState } from 'react';
 import Image from 'next/image';
-import Link from 'next/link';
+import GameModal from '../components/GameModal';
+import CardGame2019 from '../components/games/CardGame2019';
 
 const miniatures = [
   { year: 2019, top: '17%', left: '10%' },
@@ -13,6 +17,19 @@ const miniatures = [
 ];
 
 export default function Home() {
+  const [selectedYear, setSelectedYear] = useState<number | null>(null);
+
+  const handleMiniatureClick = (e: React.MouseEvent, year: number) => {
+    e.stopPropagation();
+    setSelectedYear(year);
+  };
+
+  const closeModal = () => {
+    setSelectedYear(null);
+  };
+
+  const selectedMiniature = miniatures.find(m => m.year === selectedYear);
+
   return (
     <main className="relative w-full h-screen overflow-hidden">
       {/* 배경 이미지 */}
@@ -29,31 +46,53 @@ export default function Home() {
       {/* 미니어처 배치 */}
       <div className="relative w-full h-full">
         {miniatures.map((item) => (
-          <Link
+          <button
             key={item.year}
-            href={`/${item.year}`}
-            className="absolute group cursor-pointer"
+            onClick={(e) => handleMiniatureClick(e, item.year)}
+            className={`absolute group cursor-pointer w-12 h-12 transition-all duration-300 ${
+              selectedYear === item.year ? 'z-65 scale-125' : ''
+            }`}
             style={{ top: item.top, left: item.left }}
           >
             {/* 미니어처 이미지 */}
-            <div className="relative w-12 h-12 transition-transform duration-300 hover:scale-125 hover:drop-shadow-2xl">
+            <div className="relative w-full h-full transition-transform duration-300 hover:scale-125 hover:drop-shadow-2xl">
               <Image
                 src={`/images/miniatures/${item.year}.png`}
                 alt={`${item.year}`}
                 fill
-                className="object-contain opacity-30 hover:opacity-100"
+                sizes="48px"
+                className="object-contain"
               />
             </div>
 
             {/* 년도 라벨 (hover시 표시) */}
-            <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+            <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
               <span className="bg-black/70 text-white px-3 py-1 rounded text-sm font-bold whitespace-nowrap">
                 {item.year}
               </span>
             </div>
-          </Link>
+          </button>
         ))}
       </div>
+
+      {/* 게임 모달 */}
+      {selectedYear !== null && (
+        <GameModal 
+          isOpen={true} 
+          onClose={closeModal}
+          year={selectedYear}
+          miniaturePosition={selectedMiniature ? { top: selectedMiniature.top, left: selectedMiniature.left } : undefined}
+        >
+          {selectedYear === 2019 ? (
+            <CardGame2019 />
+          ) : (
+            <div className="text-center text-white">
+              <h2 className="text-4xl font-bold mb-4">{selectedYear}</h2>
+              <p>준비중입니다...</p>
+            </div>
+          )}
+        </GameModal>
+      )}
     </main>
   );
 }
