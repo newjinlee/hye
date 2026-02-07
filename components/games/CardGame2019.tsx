@@ -134,7 +134,7 @@ export default function CardGame2019() {
                 ) : (
                   <div className="relative w-full h-full">
                     <Image
-                      src="/images/card.jpg"
+                      src="/images/games/2019/card.jpg"
                       alt="card back"
                       fill
                       className="object-cover"
