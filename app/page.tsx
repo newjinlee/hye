@@ -1,7 +1,6 @@
-// page.tsx 수정
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import GameModal from "../components/GameModal";
 import GalleryModal from "../components/GalleryModal";
@@ -16,6 +15,7 @@ import MazeGame2025 from "@/components/games/MazeGame2025";
 import MusicPlayer from "@/components/MusicPlayer";
 import NoteModal from "@/components/NoteModal";
 import MagnifyingCursor from "@/components/MagnifyingCursor";
+import SecretFinder from "@/components/SecretFinder";
 
 const miniatures = [
   { year: 2019, top: "17%", left: "10%" },
@@ -30,12 +30,42 @@ const miniatures = [
 
 const GAME_YEARS: GameYear[] = [2019, 2020, 2021, 2022, 2023, 2024, 2025, 2026];
 
+const secretAreas = [
+  {
+    id: 1,
+    image: "/images/secret1.gif",
+    className: "top-[62%] left-[75%] w-32 h-32"
+  },
+  {
+    id: 2,
+    image: "/images/secret2.gif",
+    className: "top-[10%] left-[65%] w-40 h-24"
+  },
+];
+
 export default function Home() {
   const [selectedYear, setSelectedYear] = useState<number | null>(null);
   const [isGalleryOpen, setIsGalleryOpen] = useState(false);
   const [isNoteOpen, setIsNoteOpen] = useState(false);
   const [isMagnifyActive, setIsMagnifyActive] = useState(false);
+  const [activeSecret, setActiveSecret] = useState<{
+    image: string;
+    area: { top: number; left: number; width: number; height: number };
+  } | null>(null);
   const { progress } = useGameStore();
+
+  // 숨겨진 이미지 미리 로드
+  useEffect(() => {
+    const preloadImages = [
+      ...secretAreas.map((s) => s.image),
+    ];
+
+    preloadImages.forEach((src) => {
+      const img = new window.Image();
+      img.src = src;
+    });
+  }, []);
+
 
   // 하나라도 완료된 게임이 있는지 확인
   const hasAnyCompleted = GAME_YEARS.some((year) => progress[year]?.completed);
@@ -55,6 +85,12 @@ export default function Home() {
     <main className="relative w-full h-screen overflow-hidden">
       <MusicPlayer />
       <MagnifyingCursor isActive={isMagnifyActive} zoomLevel={2} size={150} />
+      <SecretFinder
+  isActive={activeSecret !== null}
+  hiddenImage={activeSecret?.image || ""}
+  size={150}
+  targetArea={activeSecret?.area}
+/>
 
       {/* 돋보기 활성화 영역 - 실제 사용 */}
       <div
@@ -63,10 +99,30 @@ export default function Home() {
         onMouseLeave={() => setIsMagnifyActive(false)}
       />
       <div
-        className="absolute z-10 top-[62%] left-[28%] w-64 h-64"
+        className="absolute z-10 top-[62%] left-[28%] w-32 h-32"
         onMouseEnter={() => setIsMagnifyActive(true)}
         onMouseLeave={() => setIsMagnifyActive(false)}
       />
+
+{secretAreas.map((secret) => (
+  <div
+    key={secret.id}
+    className={`absolute z-10 ${secret.className}`}
+    onMouseEnter={(e) => {
+      const rect = e.currentTarget.getBoundingClientRect();
+      setActiveSecret({
+        image: secret.image,
+        area: {
+          top: rect.top,
+          left: rect.left,
+          width: rect.width,
+          height: rect.height,
+        },
+      });
+    }}
+    onMouseLeave={() => setActiveSecret(null)}
+  />
+))}
 
       {/* 배경 이미지 */}
       <div className="absolute inset-0 w-full h-full">

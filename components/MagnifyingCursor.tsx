@@ -8,10 +8,10 @@ type Props = {
   size?: number;
 };
 
-export default function MagnifyingCursor({ 
-  isActive, 
-  zoomLevel = 2, 
-  size = 150 
+export default function MagnifyingCursor({
+  isActive,
+  zoomLevel = 2,
+  size = 150,
 }: Props) {
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const [isMouseInWindow, setIsMouseInWindow] = useState(true);
@@ -48,22 +48,22 @@ export default function MagnifyingCursor({
   if (!visible) return null;
 
   return (
-   <div
-  className="fixed pointer-events-none z-9999 rounded-full overflow-hidden"
-  style={{
-    width: size,
-    height: size,
-    left: position.x - size / 2,
-    top: position.y - size / 2,
-    background: `url('/images/background.jpg')`,
-    backgroundPosition: `${-position.x * zoomLevel + size / 2}px ${-position.y * zoomLevel + size / 2}px`,
-    backgroundSize: `${window.innerWidth * zoomLevel}px ${window.innerHeight * zoomLevel}px`,
-    boxShadow: `
+    <div
+      className="fixed pointer-events-none z-9999 rounded-full overflow-hidden"
+      style={{
+        width: size,
+        height: size,
+        left: position.x - size / 2,
+        top: position.y - size / 2,
+        background: `url('/images/background.jpg')`,
+        backgroundPosition: `${-position.x * zoomLevel + size / 2}px ${-position.y * zoomLevel + size / 2}px`,
+        backgroundSize: `${window.innerWidth * zoomLevel}px ${window.innerHeight * zoomLevel}px`,
+        boxShadow: `
       0 0 0 4px rgba(255,255,255,0.5),
       0 0 20px rgba(0,0,0,0.5),
       inset 0 0 30px rgba(255,255,255,0.2)
     `,
-  }}
-/>
+      }}
+    />
   );
 }
