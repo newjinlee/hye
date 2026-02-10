@@ -1,8 +1,10 @@
+// page.tsx 수정
 "use client";
 
 import { useState } from "react";
 import Image from "next/image";
 import GameModal from "../components/GameModal";
+import GalleryModal from "../components/GalleryModal";
 import CardGame2019 from "../components/games/CardGame2019";
 import { useGameStore, GameYear } from "@/store/gameStore";
 import PuzzleGame2020 from "@/components/games/PuzzleGame2020";
@@ -24,9 +26,15 @@ const miniatures = [
   { year: 2026, top: "80%", left: "25%" },
 ];
 
+const GAME_YEARS: GameYear[] = [2019, 2020, 2021, 2022, 2023, 2024, 2025, 2026];
+
 export default function Home() {
   const [selectedYear, setSelectedYear] = useState<number | null>(null);
+  const [isGalleryOpen, setIsGalleryOpen] = useState(false);
   const { progress } = useGameStore();
+
+  // 하나라도 완료된 게임이 있는지 확인
+  const hasAnyCompleted = GAME_YEARS.some(year => progress[year]?.completed);
 
   const handleMiniatureClick = (e: React.MouseEvent, year: number) => {
     e.stopPropagation();
@@ -42,6 +50,7 @@ export default function Home() {
   return (
     <main className="relative w-full h-screen overflow-hidden">
       <MusicPlayer />
+      
       {/* 배경 이미지 */}
       <div className="absolute inset-0 w-full h-full">
         <Image
@@ -69,11 +78,10 @@ export default function Home() {
               }`}
               style={{ top: item.top, left: item.left }}
             >
-              {/* 미니어처 이미지 + 완료 시 녹색 테두리 */}
               <div
                 className={`relative w-full h-full transition-transform duration-300 hover:scale-125 ${
                   isCompleted
-                    ? "drop-shadow-[0_0_8px_rgba(34,197,94,0.8)]"
+                    ? "drop-shadow-[0_0_8px_rgba(241,194,50,0.8)]"
                     : "hover:drop-shadow-2xl"
                 }`}
               >
@@ -88,7 +96,6 @@ export default function Home() {
                 />
               </div>
 
-              {/* 년도 라벨 */}
               <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
                 <span className="bg-black/70 text-white px-3 py-1 rounded text-sm font-bold whitespace-nowrap">
                   {item.year}
@@ -97,6 +104,31 @@ export default function Home() {
             </button>
           );
         })}
+
+        {/* 갤러리 미니어처 (하나라도 완료 시 표시) */}
+        {hasAnyCompleted && (
+          <button
+            onClick={() => setIsGalleryOpen(true)}
+            className="absolute group cursor-pointer w-12 h-12 transition-all duration-300 z-10"
+            style={{ top: "35%", left: "54%" }}
+          >
+            <div className="relative w-full h-full transition-transform duration-300 hover:scale-125 drop-shadow-[0_0_8px_rgba(255,255,255,0.8)]">
+              <Image
+                src="/images/miniatures/gallery.png"
+                alt="Gallery"
+                fill
+                sizes="48px"
+                className="object-contain"
+              />
+            </div>
+
+            <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
+              <span className="bg-black/70 text-white px-3 py-1 rounded text-sm whitespace-nowrap">
+                Gallery
+              </span>
+            </div>
+          </button>
+        )}
       </div>
 
       {/* 게임 모달 */}
@@ -133,6 +165,12 @@ export default function Home() {
           )}
         </GameModal>
       )}
+
+      {/* 갤러리 모달 */}
+      <GalleryModal 
+        isOpen={isGalleryOpen} 
+        onClose={() => setIsGalleryOpen(false)} 
+      />
     </main>
   );
 }
