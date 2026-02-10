@@ -1,4 +1,3 @@
-// components/MusicPlayer.tsx
 "use client";
 
 import { useState, useRef, useEffect } from "react";
@@ -7,7 +6,7 @@ import { Slider } from "@/components/ui/slider";
 
 export default function MusicPlayer() {
   const [isPlaying, setIsPlaying] = useState(false);
-  const [volume, setVolume] = useState(50);
+  const [volume, setVolume] = useState(20);
   const [prevVolume, setPrevVolume] = useState(50);
   const [showVolume, setShowVolume] = useState(false);
   const audioRef = useRef<HTMLAudioElement>(null);

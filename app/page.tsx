@@ -14,6 +14,7 @@ import VideoPlayer2023 from "@/components/games/VideoPlayer2023";
 import CaptchaGame2024 from "@/components/games/CaptchaGame2024";
 import MazeGame2025 from "@/components/games/MazeGame2025";
 import MusicPlayer from "@/components/MusicPlayer";
+import NoteModal from "@/components/NoteModal";
 
 const miniatures = [
   { year: 2019, top: "17%", left: "10%" },
@@ -31,6 +32,7 @@ const GAME_YEARS: GameYear[] = [2019, 2020, 2021, 2022, 2023, 2024, 2025, 2026];
 export default function Home() {
   const [selectedYear, setSelectedYear] = useState<number | null>(null);
   const [isGalleryOpen, setIsGalleryOpen] = useState(false);
+  const [isNoteOpen, setIsNoteOpen] = useState(false);
   const { progress } = useGameStore();
 
   // 하나라도 완료된 게임이 있는지 확인
@@ -129,6 +131,30 @@ export default function Home() {
             </div>
           </button>
         )}
+
+        {/* 방명록 미니어처 (항상 표시) */}
+        <button
+          onClick={() => setIsNoteOpen(true)}
+          className="absolute group cursor-pointer w-12 h-12 transition-all duration-300 z-10"
+          style={{ top: "10%", left: "20%" }}
+        >
+          <div className="relative w-full h-full transition-transform duration-300 hover:scale-125 drop-shadow-[0_0_8px_rgba(255,255,255,0.6)]">
+            <Image
+              src="/images/miniatures/note.png"
+              alt="방명록"
+              fill
+              sizes="48px"
+              className="object-contain"
+            />
+          </div>
+
+          <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
+            <span className="bg-black/70 text-white px-3 py-1 rounded text-sm font-bold whitespace-nowrap">
+              방명록
+            </span>
+          </div>
+        </button>
+
       </div>
 
       {/* 게임 모달 */}
@@ -171,6 +197,13 @@ export default function Home() {
         isOpen={isGalleryOpen} 
         onClose={() => setIsGalleryOpen(false)} 
       />
+
+      {/* 방명록 모달 */}
+      <NoteModal
+        isOpen={isNoteOpen} 
+        onClose={() => setIsNoteOpen(false)} 
+      />
+
     </main>
   );
 }
