@@ -230,13 +230,13 @@ export default function StackGame2021() {
 
           {/* 하단 컨트롤 */}
           <div className="w-full flex justify-end gap-2">
-            <button
+            {/* <button
               onClick={handleGameComplete}
               className="px-3 py-2 bg-green-600/80 hover:bg-green-500 text-white text-xs rounded-lg transition font-bold"
             >
               Clear(Dev)
             </button>
-
+*/}
             <button
               onClick={initializeGame}
               className="px-2 py-2 hover:bg-white/30 text-white rounded-lg transition"
@@ -261,9 +261,6 @@ export default function StackGame2021() {
       ) : gameState === "gameOver" ? (
         <div className="text-center py-8">
           <p className="text-white/70 mb-1">{currentFloor}층에서 무너졌어요</p>
-          <p className="text-white/50 text-sm mb-4">
-            Perfect: {perfectCount}회
-          </p>
           <button
             onClick={initializeGame}
             className="px-6 py-3 bg-white/20 hover:bg-white/30 text-white rounded-lg transition font-semibold"
