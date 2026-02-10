@@ -10,6 +10,7 @@ import StackGame2021 from "@/components/games/StackGame2021";
 import CatchGame2022 from "@/components/games/CatchGame2022";
 import VideoPlayer2023 from "@/components/games/VideoPlayer2023";
 import CaptchaGame2024 from "@/components/games/CaptchaGame2024";
+import MazeGame2025 from "@/components/games/MazeGame2025";
 
 const miniatures = [
   { year: 2019, top: "17%", left: "10%" },
@@ -120,6 +121,8 @@ export default function Home() {
             <VideoPlayer2023 />
           ) : selectedYear === 2024 ? (
             <CaptchaGame2024 />
+          ) : selectedYear === 2025 ? (
+            <MazeGame2025 />
           ) : (
             <div className="text-center text-white">
               <h2 className="text-4xl font-bold mb-4">{selectedYear}</h2>
