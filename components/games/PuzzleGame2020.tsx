@@ -8,20 +8,21 @@ type Tile = {
   currentPos: number;
 };
 
+type GameState = "playing" | "showingPhoto" | "complete" | "gameOver";
+
 const getNeighbors = (pos: number): number[] => {
   const row = Math.floor(pos / 3);
   const col = pos % 3;
   const neighbors: number[] = [];
   
-  if (row > 0) neighbors.push(pos - 3); // 위
-  if (row < 2) neighbors.push(pos + 3); // 아래
-  if (col > 0) neighbors.push(pos - 1); // 왼쪽
-  if (col < 2) neighbors.push(pos + 1); // 오른쪽
+  if (row > 0) neighbors.push(pos - 3);
+  if (row < 2) neighbors.push(pos + 3);
+  if (col > 0) neighbors.push(pos - 1);
+  if (col < 2) neighbors.push(pos + 1);
   
   return neighbors;
 };
 
-// 쉬운 셔플: 완성 상태에서 25번만 섞기
 const createShuffledTiles = (): Tile[] => {
   const tiles: Tile[] = [0, 1, 2, 3, 4, 5, 6, 7, 8].map((id) => ({
     id,
@@ -29,8 +30,8 @@ const createShuffledTiles = (): Tile[] => {
   }));
   
   let emptyPos = 8;
-  const moves = 25;
-  let lastPos = -1; // 되돌아가는 거 방지
+  const moves = 20;
+  let lastPos = -1;
   
   for (let i = 0; i < moves; i++) {
     const neighbors = getNeighbors(emptyPos).filter(n => n !== lastPos);
@@ -61,16 +62,16 @@ const formatTime = (seconds: number): string => {
 export default function PuzzleGame2020() {
   const [tiles, setTiles] = useState<Tile[]>(() => createShuffledTiles());
   const [timeLeft, setTimeLeft] = useState(300);
-  const [gameComplete, setGameComplete] = useState(false);
+  const [gameState, setGameState] = useState<GameState>("playing");
+  const [completedTime, setCompletedTime] = useState(0);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const hasFailedRef = useRef(false);
 
   const { completeGame, failGame } = useGameStore();
 
-  const isGameOver = timeLeft === 0 && !gameComplete;
-
+  // 게임 타이머
   useEffect(() => {
-    if (gameComplete || timeLeft === 0) return;
+    if (gameState !== "playing" || timeLeft === 0) return;
 
     timerRef.current = setInterval(() => {
       setTimeLeft((prev) => {
@@ -78,7 +79,10 @@ export default function PuzzleGame2020() {
           clearInterval(timerRef.current!);
           if (!hasFailedRef.current) {
             hasFailedRef.current = true;
-            setTimeout(() => failGame(2020), 0);
+            setTimeout(() => {
+              failGame(2020);
+              setGameState("gameOver");
+            }, 0);
           }
           return 0;
         }
@@ -89,20 +93,33 @@ export default function PuzzleGame2020() {
     return () => {
       if (timerRef.current) clearInterval(timerRef.current);
     };
-  }, [gameComplete, timeLeft, failGame]);
+  }, [gameState, timeLeft, failGame]);
+
+  // 사진 보여주기 → Success 전환 (3초)
+  useEffect(() => {
+    if (gameState !== "showingPhoto") return;
+
+    const timeout = setTimeout(() => {
+      setGameState("complete");
+      completeGame(2020);
+    }, 3000);
+
+    return () => clearTimeout(timeout);
+  }, [gameState, completeGame]);
 
   const initializeGame = () => {
     if (timerRef.current) clearInterval(timerRef.current);
     hasFailedRef.current = false;
     setTiles(createShuffledTiles());
     setTimeLeft(300);
-    setGameComplete(false);
+    setGameState("playing");
+    setCompletedTime(0);
   };
 
   const handleGameComplete = () => {
     if (timerRef.current) clearInterval(timerRef.current);
-    setGameComplete(true);
-    completeGame(2020);
+    setCompletedTime(300 - timeLeft);
+    setGameState("showingPhoto");
   };
 
   const getEmptyTilePos = (): number => {
@@ -123,7 +140,7 @@ export default function PuzzleGame2020() {
   };
 
   const handleTileClick = (clickedPos: number) => {
-    if (gameComplete || isGameOver) return;
+    if (gameState !== "playing") return;
     if (!canMove(clickedPos)) return;
 
     const emptyPos = getEmptyTilePos();
@@ -152,7 +169,7 @@ export default function PuzzleGame2020() {
 
   return (
     <div className="w-full flex flex-col items-center">
-      {!gameComplete && !isGameOver ? (
+      {gameState === "playing" ? (
         <>
           <div className="grid grid-cols-3 gap-1 mb-4 bg-black/30 p-1 rounded-lg">
             {[0, 1, 2, 3, 4, 5, 6, 7, 8].map((pos) => {
@@ -188,7 +205,9 @@ export default function PuzzleGame2020() {
           </div>
 
           <div className="w-full flex justify-between items-center">
-            <span className={`text-lg font-mono ${timeLeft <= 30 ? "text-red-400" : "text-white"}`}>
+            <span
+              className={`text-lg font-mono ${timeLeft <= 30 ? "text-red-400" : "text-white"}`}
+            >
               ⏱ {formatTime(timeLeft)}
             </span>
 
@@ -209,7 +228,21 @@ export default function PuzzleGame2020() {
             </div>
           </div>
         </>
-      ) : isGameOver ? (
+      ) : gameState === "showingPhoto" ? (
+        // 완성 사진 3초 보여주기
+        <div className="flex flex-col items-center">
+          <div className="grid grid-cols-3 gap-1 mb-4 bg-black/30 p-1 rounded-lg overflow-hidden animate-pulse">
+            <div className="col-span-3 w-[calc(5rem*3+0.25rem*2)] sm:w-[calc(6rem*3+0.25rem*2)] aspect-4/3">
+              <img
+                src="/images/games/2020/puzzle.jpg"
+                alt="완성!"
+                className="w-full h-full object-cover"
+              />
+            </div>
+          </div>
+          <p className="text-white text-lg">Success!</p>
+        </div>
+      ) : gameState === "gameOver" ? (
         <div className="text-center py-8">
           <p className="text-white/70 mb-4">시간 초과!</p>
           <button
@@ -220,8 +253,11 @@ export default function PuzzleGame2020() {
           </button>
         </div>
       ) : (
+        // complete
         <div className="bg-white/50 backdrop-blur rounded-lg shadow-lg p-6">
-          <p className="text-center text-xl font-bold font-main italic mb-4">Success!</p>
+          <p className="text-center text-xl font-bold font-main italic mb-4">
+            Success!
+          </p>
           <p className="text-center">2020년의 데이터가 저장되었습니다.</p>
         </div>
       )}
