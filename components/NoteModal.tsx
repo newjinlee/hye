@@ -103,7 +103,7 @@ export default function NoteModal({ isOpen, onClose }: Props) {
         </button>
 
         {/* 타이틀 */}
-        <h2 className="text-white text-xl text-center mb-4">방명록</h2>
+        <h2 className="text-white text-xl text-center mb-4">Note</h2>
 
         {/* 말풍선 영역 */}
         <div className="flex-1 overflow-y-auto px-4 pb-32">

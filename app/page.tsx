@@ -15,6 +15,7 @@ import CaptchaGame2024 from "@/components/games/CaptchaGame2024";
 import MazeGame2025 from "@/components/games/MazeGame2025";
 import MusicPlayer from "@/components/MusicPlayer";
 import NoteModal from "@/components/NoteModal";
+import MagnifyingCursor from "@/components/MagnifyingCursor";
 
 const miniatures = [
   { year: 2019, top: "17%", left: "10%" },
@@ -23,8 +24,8 @@ const miniatures = [
   { year: 2022, top: "50%", left: "58%" },
   { year: 2023, top: "68%", left: "50%" },
   { year: 2024, top: "90%", left: "73%" },
-  { year: 2025, top: "21%", left: "82%" },
-  { year: 2026, top: "80%", left: "25%" },
+  { year: 2025, top: "20%", left: "82%" },
+  { year: 2026, top: "80%", left: "21%" },
 ];
 
 const GAME_YEARS: GameYear[] = [2019, 2020, 2021, 2022, 2023, 2024, 2025, 2026];
@@ -33,10 +34,11 @@ export default function Home() {
   const [selectedYear, setSelectedYear] = useState<number | null>(null);
   const [isGalleryOpen, setIsGalleryOpen] = useState(false);
   const [isNoteOpen, setIsNoteOpen] = useState(false);
+  const [isMagnifyActive, setIsMagnifyActive] = useState(false);
   const { progress } = useGameStore();
 
   // 하나라도 완료된 게임이 있는지 확인
-  const hasAnyCompleted = GAME_YEARS.some(year => progress[year]?.completed);
+  const hasAnyCompleted = GAME_YEARS.some((year) => progress[year]?.completed);
 
   const handleMiniatureClick = (e: React.MouseEvent, year: number) => {
     e.stopPropagation();
@@ -52,7 +54,20 @@ export default function Home() {
   return (
     <main className="relative w-full h-screen overflow-hidden">
       <MusicPlayer />
-      
+      <MagnifyingCursor isActive={isMagnifyActive} zoomLevel={2} size={150} />
+
+      {/* 돋보기 활성화 영역 - 실제 사용 */}
+      <div
+        className="absolute z-10 top-[15%] left-[20%] w-64 h-64"
+        onMouseEnter={() => setIsMagnifyActive(true)}
+        onMouseLeave={() => setIsMagnifyActive(false)}
+      />
+      <div
+        className="absolute z-10 top-[62%] left-[28%] w-64 h-64"
+        onMouseEnter={() => setIsMagnifyActive(true)}
+        onMouseLeave={() => setIsMagnifyActive(false)}
+      />
+
       {/* 배경 이미지 */}
       <div className="absolute inset-0 w-full h-full">
         <Image
@@ -99,7 +114,7 @@ export default function Home() {
               </div>
 
               <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
-                <span className="bg-black/70 text-white px-3 py-1 rounded text-sm font-bold whitespace-nowrap">
+                <span className="bg-black/70 text-white px-3 py-1 rounded text-sm whitespace-nowrap">
                   {item.year}
                 </span>
               </div>
@@ -149,12 +164,36 @@ export default function Home() {
           </div>
 
           <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
-            <span className="bg-black/70 text-white px-3 py-1 rounded text-sm font-bold whitespace-nowrap">
-              방명록
+            <span className="bg-black/70 text-white px-3 py-1 rounded text-sm whitespace-nowrap">
+              Note
             </span>
           </div>
         </button>
 
+        <a
+          href="https://instagram.com/cometui"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="absolute group w-12 h-12 transition-all duration-300 z-10"
+          style={{ top: "75%", left: "90%" }}
+        >
+          <div className="relative w-full h-full transition-transform duration-300 hover:scale-125 drop-shadow-[0_0_8px_rgba(255,255,255,0.5)] hover:drop-shadow-[0_0_12px_rgba(255,255,255,0.8)]">
+            <Image
+              src="/images/miniatures/instagram.png"
+              alt="Instagram"
+              fill
+              sizes="48px"
+              className="object-contain"
+            />
+          </div>
+
+          {/* 라벨 */}
+          <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
+            <span className="bg-black/70 text-white px-3 py-1 rounded text-sm whitespace-nowrap">
+              Insta
+            </span>
+          </div>
+        </a>
       </div>
 
       {/* 게임 모달 */}
@@ -193,17 +232,13 @@ export default function Home() {
       )}
 
       {/* 갤러리 모달 */}
-      <GalleryModal 
-        isOpen={isGalleryOpen} 
-        onClose={() => setIsGalleryOpen(false)} 
+      <GalleryModal
+        isOpen={isGalleryOpen}
+        onClose={() => setIsGalleryOpen(false)}
       />
 
       {/* 방명록 모달 */}
-      <NoteModal
-        isOpen={isNoteOpen} 
-        onClose={() => setIsNoteOpen(false)} 
-      />
-
+      <NoteModal isOpen={isNoteOpen} onClose={() => setIsNoteOpen(false)} />
     </main>
   );
 }
