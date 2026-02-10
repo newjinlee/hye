@@ -16,7 +16,7 @@ export const metadata: Metadata = {
       {
         url: "/images/og-image.png",
         width: 1200,
-        height: 800,
+        height: 630,
         alt: "혜승의 타임라인",
       },
     ],
