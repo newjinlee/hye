@@ -91,7 +91,7 @@ export default function MusicPlayer() {
 
   return (
     <div className="fixed top-4 right-4 z-50 flex items-center gap-2">
-      <audio ref={audioRef} src="/audio/bgm.mp3" loop />
+      <audio ref={audioRef} src="/audio/bgm.m4a" loop />
 
       <button
         onClick={togglePlay}
