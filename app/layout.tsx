@@ -14,7 +14,7 @@ export const metadata: Metadata = {
     description: "졸업을 축하하며",
     images: [
       {
-        url: "/images/og-image.jpg",
+        url: "/images/og-image.png",
         width: 1200,
         height: 800,
         alt: "혜승의 타임라인",
