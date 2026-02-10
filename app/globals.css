@@ -163,4 +163,16 @@ body {
   background-color: var(--background);
   color: var(--foreground);
   font-family: 'DungGeunMo', sans-serif;
+  cursor: url('/images/cursor.png'), auto;
+}
+
+a,
+button,
+[role="button"],
+input[type="submit"],
+input[type="button"],
+select,
+label[for],
+.cursor-pointer {
+  cursor: url('/images/cursor-pointer.png'), auto;
 }

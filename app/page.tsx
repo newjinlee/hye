@@ -11,6 +11,7 @@ import CatchGame2022 from "@/components/games/CatchGame2022";
 import VideoPlayer2023 from "@/components/games/VideoPlayer2023";
 import CaptchaGame2024 from "@/components/games/CaptchaGame2024";
 import MazeGame2025 from "@/components/games/MazeGame2025";
+import MusicPlayer from "@/components/MusicPlayer";
 
 const miniatures = [
   { year: 2019, top: "17%", left: "10%" },
@@ -40,6 +41,7 @@ export default function Home() {
 
   return (
     <main className="relative w-full h-screen overflow-hidden">
+      <MusicPlayer />
       {/* 배경 이미지 */}
       <div className="absolute inset-0 w-full h-full">
         <Image
